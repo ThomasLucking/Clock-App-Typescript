@@ -1,3 +1,4 @@
+drop table Labels cascade;
 
 create table Projects(
     project_id int generated always as identity primary key,
@@ -11,6 +12,7 @@ create table Projects(
 create table Labels(
     label_id int generated always as identity primary key,
     name varchar(255) not null,
+    color varchar(255) not null,
     created_at timestamptz not null default current_timestamp,
     updated_at timestamptz not null default current_timestamp
 );
