@@ -2,7 +2,7 @@ drop table Labels cascade;
 
 create table Projects(
     project_id int generated always as identity primary key,
-    name text not null,
+    name varchar(255) not null,
     description text not null,
     created_at timestamptz not null default current_timestamp,
     updated_at timestamptz not null default current_timestamp
@@ -37,4 +37,8 @@ create table Time_entry_labels(
     foreign key (time_entry_id) references Time_entries(time_entry_id) on delete cascade,
     foreign key (label_id) references Labels(label_id) on delete cascade
 );
+
+
+create index idx_time_entries_project_id on Time_entries(project_id);
+create index idx_time_entry_labels_label_id on Time_entry_labels(label_id);
 
