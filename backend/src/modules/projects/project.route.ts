@@ -7,13 +7,7 @@ export const projectRoutes = new Elysia({ prefix: '/projects' })
     if (code === 'VALIDATION') return error.detail(error.message)
     return status(500, { error: 'Internal server error' })
   })
-
-  .get('/', async ({ status }) => {
-    const projects = await getProjects()
-    if (projects.length === 0) return status(404, { error: 'No projects found' })
-    return projects
-  })
-
+  .get('/', () => getProjects())
   .post('/', async ({ body, status }) => {
     const result = await createProject(body)
     if (result.length === 0) return status(400, { error: 'Failed to create project' })

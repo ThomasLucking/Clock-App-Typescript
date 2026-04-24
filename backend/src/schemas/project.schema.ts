@@ -7,7 +7,7 @@ export const ProjectInsertSchema = v.object({
 
 export const ProjectSchema = v.object({
   ...ProjectInsertSchema.entries,
-  id: v.number(),
+  project_id: v.number(),
   created_at: v.string(),
   updated_at: v.string(),
 })

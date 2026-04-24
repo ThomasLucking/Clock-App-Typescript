@@ -8,7 +8,7 @@ export const createProject = (data: ProjectInsert) =>
   sql`insert into projects (name, description) values (${data.name}, ${data.description}) returning *`
 
 export const deleteProject = (id: number) =>
-  sql`delete from projects where id = ${id} returning *`
+  sql`delete from projects where project_id = ${id} returning *`
 
 export const modifyProject = (data: ProjectUpdate, id: number) =>
   sql`update projects set
