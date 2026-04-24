@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
 import { projectRoutes } from "./modules/projects/project.route";
+
 const app = new Elysia()
   .use(projectRoutes)
   
