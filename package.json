@@ -2,6 +2,7 @@
   "dependencies": {
     "@elysia/cors": "^1.4.2",
     "@elysiajs/cors": "^1.4.2",
-    "elysia": "^1.4.28"
+    "elysia": "^1.4.28",
+    "valibot": "^1.3.1"
   }
 }
