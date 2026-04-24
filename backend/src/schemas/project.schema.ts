@@ -8,8 +8,8 @@ export const ProjectInsertSchema = v.object({
 export const ProjectSchema = v.object({
   ...ProjectInsertSchema.entries,
   id: v.number(),
-  created_at: v.union([v.date(), v.string()]),
-  updated_at: v.union([v.date(), v.string()]),
+  created_at: v.string(),
+  updated_at: v.string(),
 })
 
 export const paramsSchema = v.object({
