@@ -1,5 +1,5 @@
 import sql from '../../db/client'
-import type { Project, ProjectInsert, ProjectUpdate } from '../../schemas/projectSchema'
+import type { ProjectInsert, ProjectUpdate } from '../../schemas/project.schema'
 export const getProjects = () =>
   sql`select * from projects`
 
