@@ -50,7 +50,14 @@ export const entryLabelParamsSchema = v.object({
   labelId: v.pipe(v.string(), v.transform(Number), v.integer(), v.minValue(1))
 })
 
+
+export const paginationSchema = v.object({
+    page: v.optional(v.pipe(v.string(), v.transform(Number), v.integer(), v.minValue(1))),
+    limit: v.optional(v.pipe(v.string(), v.transform(Number), v.integer(), v.minValue(1))),
+})
+
 export type EntryInsert = v.InferOutput<typeof entriesInsertSchema>
 export type EntryUpdate = v.InferOutput<typeof entriesUpdateSchema>
 export type Entry = v.InferOutput<typeof entriesSchema>
 export type entryLabel = v.InferOutput<typeof entriesSchema>
+export type Pagination = v.InferOutput<typeof paginationSchema>
