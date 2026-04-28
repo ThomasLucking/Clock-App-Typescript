@@ -6,10 +6,10 @@ import { createLabel, deleteLabel, getLabels, modifyLabel } from './labels.queri
 export const labelRoutes = new Elysia({ prefix: '/labels' })
   .onError(({ error, code, status }) => {
     if (code === 'VALIDATION') return error.message
-    if(code == 'NOT_FOUND') return error.message
-    return status(500, { error: error })
+    if(code === 'NOT_FOUND') return error.message
+    return status(500, { error: 'Internal Server Error' })
   })
-  .get('/', () => getLabels())
+  .get('', () => getLabels())
   .post('/', async ({ body, status }) => {
     const result = await createLabel(body)
     if (result.length === 0) return status(400, { error: 'Failed to create label' })
