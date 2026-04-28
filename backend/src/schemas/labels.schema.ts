@@ -20,6 +20,11 @@ export const LabelUpdateSchema = v.pipe(
   )
 )
 
+export const entryLabelSchema = v.object({
+  label_id: v.number(),
+})
+
+
 export type LabelInsert = v.InferOutput<typeof LabelInsertSchema>
 export type LabelUpdate = v.InferOutput<typeof LabelUpdateSchema>
 export type Label = v.InferOutput<typeof LabelSchema>

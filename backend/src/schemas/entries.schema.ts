@@ -40,6 +40,17 @@ export const entriesUpdateSchema = v.pipe(
   )
 )
 
+
+export const entryLabelSchema = v.object({
+  label_id: v.number(),
+})
+
+export const entryLabelParamsSchema = v.object({
+  id: v.pipe(v.string(), v.transform(Number), v.integer(), v.minValue(1)),
+  labelId: v.pipe(v.string(), v.transform(Number), v.integer(), v.minValue(1))
+})
+
 export type EntryInsert = v.InferOutput<typeof entriesInsertSchema>
 export type EntryUpdate = v.InferOutput<typeof entriesUpdateSchema>
 export type Entry = v.InferOutput<typeof entriesSchema>
+export type entryLabel = v.InferOutput<typeof entriesSchema>
