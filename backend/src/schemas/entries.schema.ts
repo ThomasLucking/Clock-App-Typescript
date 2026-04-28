@@ -4,8 +4,8 @@ export const entriesInsertSchema = v.pipe(
   v.object({
     project_id: v.number(),
     description: v.string(),
-    start_time: v.pipe(v.string(), v.transform(s => new Date(s))),
-    end_time: v.pipe(v.string(), v.transform(s => new Date(s))),
+    start_time: v.pipe(v.string(), v.isoTimestamp(), v.transform(s => new Date(s))),
+    end_time: v.pipe(v.string(), v.isoTimestamp(), v.transform(s => new Date(s))),
   }),
   v.check(
     (data) => data.end_time >= data.start_time,
@@ -19,16 +19,16 @@ export const entriesSchema = v.object({
   start_time: v.date(),
   end_time: v.date(),
   time_entry_id: v.number(),
-  created_at: v.string(),
-  updated_at: v.string(),
+  created_at: v.date(),
+  updated_at: v.date(),
 })
 
 export const entriesUpdateSchema = v.pipe(
   v.partial(v.object({
     project_id: v.number(),
     description: v.string(),
-    start_time: v.pipe(v.string(), v.transform(s => new Date(s))),
-    end_time: v.pipe(v.string(), v.transform(s => new Date(s))),
+    start_time: v.pipe(v.string(), v.isoTimestamp(), v.transform(s => new Date(s))),
+    end_time: v.pipe(v.string(), v.isoTimestamp(), v.transform(s => new Date(s))),
   })),
   v.check(
     (data) => Object.values(data).some((v) => v !== undefined),

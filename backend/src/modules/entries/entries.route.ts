@@ -17,7 +17,7 @@ export const entriesRoutes = new Elysia({ prefix: '/entries' })
   }, {
     params: paramsSchema
   })
-  .post('/', async ({ body, status }) => {
+  .post('', async ({ body, status }) => {
     const result = await createEntry(body)
     if (result.length === 0) return status(400, { error: 'Failed to create entry' })
     return status(201, result[0])
