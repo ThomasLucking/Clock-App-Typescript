@@ -44,6 +44,8 @@ export const entriesRoutes = new Elysia({ prefix: "/entries" })
           limit,
           total: Number(count[0].count),
           totalPages: Math.ceil(Number(count[0].count) / limit),
+          hasNextPage: page < Math.ceil(Number(count[0].count) / limit),
+          hasPrevPage: page > 1
         },
       };
     },

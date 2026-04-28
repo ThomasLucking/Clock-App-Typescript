@@ -2,7 +2,7 @@ import sql from "../../db/client";
 import type { EntryInsert, EntryUpdate } from "../../schemas/entries.schema";
 
 export const getEntries = (limit: number, offset: number) =>
-  sql`select * from Time_entries order by created_at desc limit ${limit} offset ${offset}`;
+  sql`select * from Time_entries order by created_at desc, time_entry_id desc limit ${limit} offset ${offset}`;
 
 export const getEntriesCount = () => sql`select count(*) from Time_entries`;
 
