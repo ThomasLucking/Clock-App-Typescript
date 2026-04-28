@@ -88,5 +88,5 @@ export const paginationSchema = v.object({
 export type EntryInsert = v.InferOutput<typeof entriesInsertSchema>;
 export type EntryUpdate = v.InferOutput<typeof entriesUpdateSchema>;
 export type Entry = v.InferOutput<typeof entriesSchema>;
-export type entryLabel = v.InferOutput<typeof entriesSchema>;
+export type EntryLabel = v.InferOutput<typeof entryLabelSchema>;
 export type Pagination = v.InferOutput<typeof paginationSchema>;

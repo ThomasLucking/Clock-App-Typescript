@@ -30,22 +30,25 @@ export const entriesRoutes = new Elysia({ prefix: "/entries" })
     async ({ query }) => {
       const page = query.page ?? 1;
       const limit = query.limit ?? 10;
-      const offset = (page - 1) * limit;
+      const offset = (page - 1) * limit; // basically tells DB "skip" 10 rows if you are on page 2 etc..
 
-      const [data, count] = await Promise.all([
+      const [data, countResult] = await Promise.all([
         getEntries(limit, offset),
         getEntriesCount(),
       ]);
+
+      const total = Number(countResult[0].count);
+      const totalPages = Math.ceil(total / limit);
 
       return {
         data,
         meta: {
           page,
           limit,
-          total: Number(count[0].count),
-          totalPages: Math.ceil(Number(count[0].count) / limit),
-          hasNextPage: page < Math.ceil(Number(count[0].count) / limit),
-          hasPrevPage: page > 1
+          total,
+          totalPages,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1,
         },
       };
     },
