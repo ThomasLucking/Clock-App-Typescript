@@ -4,6 +4,7 @@ import {
   entriesUpdateSchema,
   entryLabelParamsSchema,
   entryLabelSchema,
+  paginationSchema,
 } from "../../schemas/entries.schema";
 import { paramsSchema } from "../../schemas/project.schema";
 import {
@@ -11,6 +12,7 @@ import {
   createEntry,
   deleteEntry,
   getEntries,
+  getEntriesCount,
   getEntryById,
   getEntryLabels,
   modifyEntry,
@@ -23,7 +25,41 @@ export const entriesRoutes = new Elysia({ prefix: "/entries" })
     if (code === "NOT_FOUND") return status(404, { error: error.message });
     return status(500, { error: "Internal Server Error" });
   })
-  .get("", () => getEntries())
+  .get(
+    "",
+    async ({ query }) => {
+      const page = query.page ?? 1;
+      const limit = query.limit ?? 10;
+      const offset = (page - 1) * limit; // basically tells DB "skip" 10 rows if you are on page 2 etc..
+
+      const [data, countResult] = await Promise.all([
+        getEntries(limit, offset),
+        getEntriesCount(),
+      ]);
+
+      const total = Number(countResult[0].count);
+      const totalPages = Math.ceil(total / limit);
+
+      return {
+        data,
+        meta: {
+          page,
+          limit,
+          total,
+          totalPages,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1,
+        },
+      };
+    },
+    {
+      query: paginationSchema,
+      detail: {
+        description:
+          "Returns time entries ordered by created_at descending (most recent first). Paginate with `page` (default 1) and `limit` (default 10) query params.",
+      },
+    },
+  )
   .get(
     "/:id",
     async ({ params: { id }, status }) => {
