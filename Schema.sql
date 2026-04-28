@@ -21,6 +21,7 @@ create table Labels(
 create table Time_entries(
     time_entry_id int generated always as identity primary key,
     project_id int not null,
+    description text not null,
     start_time timestamptz not null,
     end_time timestamptz not null,
     created_at timestamptz not null default current_timestamp,
