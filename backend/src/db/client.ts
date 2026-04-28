@@ -8,4 +8,6 @@ const sql = postgres({
   password: process.env.POSTGRES_PASSWORD,
 })
 
+
+
 export default sql

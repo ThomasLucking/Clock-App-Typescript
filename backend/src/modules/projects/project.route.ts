@@ -4,8 +4,8 @@ import { createProject, deleteProject, getProjects, modifyProject } from './proj
 
 export const projectRoutes = new Elysia({ prefix: '/projects' })
   .onError(({ error, code, status }) => {
-    if (code === 'VALIDATION') return error.detail(error.message)
-    return status(500, { error: 'Internal server error' })
+    if (code === 'VALIDATION') return error.message
+    return status(500, { error: error })
   })
   .get('/', () => getProjects())
   .post('/', async ({ body, status }) => {

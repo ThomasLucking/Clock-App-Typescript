@@ -2,7 +2,7 @@ import sql from '../../db/client'
 import type { ProjectInsert, ProjectUpdate } from '../../schemas/project.schema'
 
 export const getProjects = () =>
-  sql`select * from projects`
+  sql`select * from projects;`
 
 export const createProject = (data: ProjectInsert) =>
   sql`insert into projects (name, description) values (${data.name}, ${data.description}) returning *`
