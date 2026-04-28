@@ -72,7 +72,7 @@ export const entriesRoutes = new Elysia({ prefix: "/entries" })
   )
   .get(
     "/:id/labels",
-    async ({ params: { id }, status }) => {
+    async ({ params: { id } }) => {
       const result = await getEntryLabels(id);
       return result;
     },
