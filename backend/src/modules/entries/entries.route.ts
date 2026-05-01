@@ -37,11 +37,7 @@ export const entriesRoutes = new Elysia({ prefix: "/entries" })
         const result = await clockIn(body);
         return status(201, result[0]);
       } catch (e: unknown) {
-        if (
-          e instanceof Error &&
-          "code" in e &&
-          (e as { code: string }).code === "23505"
-        )
+        if (e instanceof Error && "code" in e && e.code === "23505")
           return status(400, { error: "Already clocked in" });
         throw e;
       }
@@ -60,11 +56,7 @@ export const entriesRoutes = new Elysia({ prefix: "/entries" })
       try {
         return await switchSession(body);
       } catch (e: unknown) {
-        if (
-          e instanceof Error &&
-          "code" in e &&
-          (e as { code: string }).code === "NO_ACTIVE_SESSION"
-        )
+        if (e instanceof Error && "code" in e && e.code === "NO_ACTIVE_SESSION")
           return status(400, { error: "No active session to switch" });
         throw e;
       }
@@ -76,7 +68,6 @@ export const entriesRoutes = new Elysia({ prefix: "/entries" })
     if (result.length === 0) return status(404, { error: "No active session" });
     return result[0];
   })
-
 
   .get(
     "",
