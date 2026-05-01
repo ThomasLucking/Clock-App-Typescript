@@ -66,19 +66,6 @@ export const clockInSchema = v.object({
   description: v.optional(v.string(), ""),
 });
 
-export const changeActiveSessionSchema = v.pipe(
-  v.partial(
-    v.object({
-      project_id: v.number(),
-      description: v.string(),
-    }),
-  ),
-  v.check(
-    (data) => Object.values(data).some((v) => v !== undefined),
-    "At least one field must be provided",
-  ),
-);
-
 export const entryLabelSchema = v.object({
   label_id: v.number(),
 });

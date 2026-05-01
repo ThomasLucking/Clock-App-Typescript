@@ -10,8 +10,8 @@ import {
 import { paramsSchema } from "../../schemas/project.schema";
 import {
   addLabelToEntry,
-  clock_in,
-  clock_out,
+  clockIn,
+  clockOut,
   createEntry,
   deleteEntry,
   getActiveSession,
@@ -32,18 +32,23 @@ export const entriesRoutes = new Elysia({ prefix: "/entries" })
   .post(
     "/clockin",
     async ({ body, status }) => {
-      const active = await getActiveSession();
-      if (active.length > 0)
-        return status(400, { error: "Already clocked in" });
-      const result = await clock_in(body);
-      if (result.length === 0)
-        return status(400, { error: "Failed to clock in" });
-      return status(201, result[0]);
+      try {
+        const result = await clockIn(body);
+        return status(201, result[0]);
+      } catch (e: unknown) {
+        if (
+          e instanceof Error &&
+          "code" in e &&
+          (e as { code: string }).code === "23505"
+        )
+          return status(400, { error: "Already clocked in" });
+        throw e;
+      }
     },
     { body: clockInSchema },
   )
   .patch("/clockout", async ({ status }) => {
-    const result = await clock_out();
+    const result = await clockOut();
     if (result.length === 0)
       return status(400, { error: "No active session to clock out" });
     return result[0];

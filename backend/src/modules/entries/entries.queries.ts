@@ -38,12 +38,12 @@ export const getEntryLabels = (entryId: number) =>
       join Time_entry_labels tel on tel.label_id = l.label_id
       where tel.time_entry_id = ${entryId}`;
 
-export const clock_in = (data: ClockIn) =>
+export const clockIn = (data: ClockIn) =>
   sql`insert into Time_entries (project_id, description, start_time)
       values (${data.project_id}, ${data.description}, now())
       returning *`;
 
-export const clock_out = () =>
+export const clockOut = () =>
   sql`update Time_entries set end_time = now(), updated_at = current_timestamp
       where end_time is null returning *`;
 
