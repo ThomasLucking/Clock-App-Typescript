@@ -25,7 +25,7 @@ export const entriesSchema = v.object({
   project_id: v.number(),
   description: v.string(),
   start_time: v.date(),
-  end_time: v.date(),
+  end_time: v.nullable(v.date()),
   time_entry_id: v.number(),
   created_at: v.date(),
   updated_at: v.date(),
