@@ -21,6 +21,7 @@ import {
   getEntryLabels,
   modifyEntry,
   removeLabelFromEntry,
+  switchSession,
 } from "./entries.queries";
 
 export const entriesRoutes = new Elysia({ prefix: "/entries" })
@@ -53,12 +54,29 @@ export const entriesRoutes = new Elysia({ prefix: "/entries" })
       return status(400, { error: "No active session to clock out" });
     return result[0];
   })
-  // to modify an active entry, import just need to pass the actives session id instead of a normal id in the modifyEntry endpoint.
+  .patch(
+    "/active/switch",
+    async ({ body, status }) => {
+      try {
+        return await switchSession(body);
+      } catch (e: unknown) {
+        if (
+          e instanceof Error &&
+          "code" in e &&
+          (e as { code: string }).code === "NO_ACTIVE_SESSION"
+        )
+          return status(400, { error: "No active session to switch" });
+        throw e;
+      }
+    },
+    { body: clockInSchema },
+  )
   .get("/active", async ({ status }) => {
     const result = await getActiveSession();
     if (result.length === 0) return status(404, { error: "No active session" });
     return result[0];
   })
+
 
   .get(
     "",

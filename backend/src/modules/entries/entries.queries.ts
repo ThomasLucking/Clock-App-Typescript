@@ -50,3 +50,20 @@ export const clockOut = () =>
 export const getActiveSession = () =>
   sql`select * from Time_entries where end_time is null`;
 
+export const switchSession = (data: ClockIn) =>
+  sql.begin(async (txSql) => {
+    const tx = txSql as unknown as typeof sql; // cast needed due to postgres.js typing limitation
+    const closed = await tx`
+      update Time_entries
+      set end_time = now(), updated_at = current_timestamp
+      where end_time is null
+      returning *`;
+    if (closed.length === 0)
+      throw Object.assign(new Error("No active session"), { code: "NO_ACTIVE_SESSION" });
+    const opened = await tx`
+      insert into Time_entries (project_id, description, start_time)
+      values (${data.project_id}, ${data.description}, now())
+      returning *`;
+    return { closed: closed[0], opened: opened[0] };
+  });
+
