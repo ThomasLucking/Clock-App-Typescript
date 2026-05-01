@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
 import {
+  clockInSchema,
   entriesInsertSchema,
   entriesUpdateSchema,
   entryLabelParamsSchema,
@@ -9,8 +10,11 @@ import {
 import { paramsSchema } from "../../schemas/project.schema";
 import {
   addLabelToEntry,
+  clock_in,
+  clock_out,
   createEntry,
   deleteEntry,
+  getActiveSession,
   getEntries,
   getEntriesCount,
   getEntryById,
@@ -25,6 +29,32 @@ export const entriesRoutes = new Elysia({ prefix: "/entries" })
     if (code === "NOT_FOUND") return status(404, { error: error.message });
     return status(500, { error: "Internal Server Error" });
   })
+  .post(
+    "/clockin",
+    async ({ body, status }) => {
+      const active = await getActiveSession();
+      if (active.length > 0)
+        return status(400, { error: "Already clocked in" });
+      const result = await clock_in(body);
+      if (result.length === 0)
+        return status(400, { error: "Failed to clock in" });
+      return status(201, result[0]);
+    },
+    { body: clockInSchema },
+  )
+  .patch("/clockout", async ({ status }) => {
+    const result = await clock_out();
+    if (result.length === 0)
+      return status(400, { error: "No active session to clock out" });
+    return result[0];
+  })
+  // to modify an active entry, import just need to pass the actives session id instead of a normal id in the modifyEntry endpoint.
+  .get("/active", async ({ status }) => {
+    const result = await getActiveSession();
+    if (result.length === 0) return status(404, { error: "No active session" });
+    return result[0];
+  })
+
   .get(
     "",
     async ({ query }) => {

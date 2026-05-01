@@ -61,6 +61,24 @@ export const entriesUpdateSchema = v.pipe(
   ),
 );
 
+export const clockInSchema = v.object({
+  project_id: v.number(),
+  description: v.optional(v.string(), ""),
+});
+
+export const changeActiveSessionSchema = v.pipe(
+  v.partial(
+    v.object({
+      project_id: v.number(),
+      description: v.string(),
+    }),
+  ),
+  v.check(
+    (data) => Object.values(data).some((v) => v !== undefined),
+    "At least one field must be provided",
+  ),
+);
+
 export const entryLabelSchema = v.object({
   label_id: v.number(),
 });
@@ -90,3 +108,4 @@ export type EntryUpdate = v.InferOutput<typeof entriesUpdateSchema>;
 export type Entry = v.InferOutput<typeof entriesSchema>;
 export type EntryLabel = v.InferOutput<typeof entryLabelSchema>;
 export type Pagination = v.InferOutput<typeof paginationSchema>;
+export type ClockIn = v.InferOutput<typeof clockInSchema>;
