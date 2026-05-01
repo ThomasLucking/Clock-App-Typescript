@@ -45,6 +45,6 @@ create index idx_time_entry_labels_label_id on Time_entry_labels(label_id);
 
 
 create unique index one_active_entry 
-on Time_entries ((end_time is null)) 
+on Time_entries ((1)) 
 where end_time is null
 
