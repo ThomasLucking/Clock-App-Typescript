@@ -8,7 +8,7 @@ export const getEntriesCount = () => sql`select count(*) from Time_entries`;
 
 export const createEntry = (data: EntryInsert) =>
   sql`insert into Time_entries (project_id, start_time, end_time, description) 
-      values (${data.project_id}, ${data.start_time}, ${data.end_time}, ${data.description}) 
+      values (${data.project_id}, ${data.start_time}, ${data.description}) 
       returning *`;
 
 export const deleteEntry = (id: number) =>
@@ -59,7 +59,7 @@ export const switchSession = (data: ClockIn) =>
       where end_time is null
       returning *`;
     if (closed.length === 0)
-      throw Object.assign(new Error("No active session"), { code: "NO_ACTIVE_SESSION" });
+      throw new Error('No active session')
     const opened = await tx`
       insert into Time_entries (project_id, description, start_time)
       values (${data.project_id}, ${data.description}, now())
