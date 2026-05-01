@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
 import {
+  clockInSchema,
   entriesInsertSchema,
   entriesUpdateSchema,
   entryLabelParamsSchema,
@@ -9,14 +10,18 @@ import {
 import { paramsSchema } from "../../schemas/project.schema";
 import {
   addLabelToEntry,
+  clockIn,
+  clockOut,
   createEntry,
   deleteEntry,
+  getActiveSession,
   getEntries,
   getEntriesCount,
   getEntryById,
   getEntryLabels,
   modifyEntry,
   removeLabelFromEntry,
+  switchSession,
 } from "./entries.queries";
 
 export const entriesRoutes = new Elysia({ prefix: "/entries" })
@@ -25,6 +30,45 @@ export const entriesRoutes = new Elysia({ prefix: "/entries" })
     if (code === "NOT_FOUND") return status(404, { error: error.message });
     return status(500, { error: "Internal Server Error" });
   })
+  .post(
+    "/clockin",
+    async ({ body, status }) => {
+      try {
+        const result = await clockIn(body);
+        return status(201, result[0]);
+      } catch (e: unknown) {
+        if (e instanceof Error && "code" in e && e.code === "23505")
+          return status(400, { error: "Already clocked in" });
+        throw e;
+      }
+    },
+    { body: clockInSchema },
+  )
+  .patch("/clockout", async ({ status }) => {
+    const result = await clockOut();
+    if (result.length === 0)
+      return status(400, { error: "No active session to clock out" });
+    return result[0];
+  })
+  .patch(
+    "/active/switch",
+    async ({ body, status }) => {
+      try {
+        return await switchSession(body);
+      } catch (e: unknown) {
+        if (e instanceof Error && "code" in e && e.code === "NO_ACTIVE_SESSION")
+          return status(400, { error: "No active session to switch" });
+        throw e;
+      }
+    },
+    { body: clockInSchema },
+  )
+  .get("/active", async ({ status }) => {
+    const result = await getActiveSession();
+    if (result.length === 0) return status(404, { error: "No active session" });
+    return result[0];
+  })
+
   .get(
     "",
     async ({ query }) => {

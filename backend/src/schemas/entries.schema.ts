@@ -25,7 +25,7 @@ export const entriesSchema = v.object({
   project_id: v.number(),
   description: v.string(),
   start_time: v.date(),
-  end_time: v.date(),
+  end_time: v.nullable(v.date()),
   time_entry_id: v.number(),
   created_at: v.date(),
   updated_at: v.date(),
@@ -61,6 +61,11 @@ export const entriesUpdateSchema = v.pipe(
   ),
 );
 
+export const clockInSchema = v.object({
+  project_id: v.number(),
+  description: v.optional(v.string(), ""),
+});
+
 export const entryLabelSchema = v.object({
   label_id: v.number(),
 });
@@ -90,3 +95,4 @@ export type EntryUpdate = v.InferOutput<typeof entriesUpdateSchema>;
 export type Entry = v.InferOutput<typeof entriesSchema>;
 export type EntryLabel = v.InferOutput<typeof entryLabelSchema>;
 export type Pagination = v.InferOutput<typeof paginationSchema>;
+export type ClockIn = v.InferOutput<typeof clockInSchema>;

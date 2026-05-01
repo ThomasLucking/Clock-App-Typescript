@@ -1,5 +1,5 @@
 import sql from "../../db/client";
-import type { EntryInsert, EntryUpdate } from "../../schemas/entries.schema";
+import type { ClockIn, EntryInsert, EntryUpdate } from "../../schemas/entries.schema";
 
 export const getEntries = (limit: number, offset: number) =>
   sql`select * from Time_entries order by created_at desc, time_entry_id desc limit ${limit} offset ${offset}`;
@@ -8,7 +8,7 @@ export const getEntriesCount = () => sql`select count(*) from Time_entries`;
 
 export const createEntry = (data: EntryInsert) =>
   sql`insert into Time_entries (project_id, start_time, end_time, description) 
-      values (${data.project_id}, ${data.start_time}, ${data.end_time}, ${data.description}) 
+      values (${data.project_id}, ${data.start_time}, ${data.description}) 
       returning *`;
 
 export const deleteEntry = (id: number) =>
@@ -37,3 +37,33 @@ export const getEntryLabels = (entryId: number) =>
   sql`select l.* from Labels l
       join Time_entry_labels tel on tel.label_id = l.label_id
       where tel.time_entry_id = ${entryId}`;
+
+export const clockIn = (data: ClockIn) =>
+  sql`insert into Time_entries (project_id, description, start_time)
+      values (${data.project_id}, ${data.description}, now())
+      returning *`;
+
+export const clockOut = () =>
+  sql`update Time_entries set end_time = now(), updated_at = current_timestamp
+      where end_time is null returning *`;
+
+export const getActiveSession = () =>
+  sql`select * from Time_entries where end_time is null`;
+
+export const switchSession = (data: ClockIn) =>
+  sql.begin(async (txSql) => {
+    const tx = txSql as unknown as typeof sql; // cast needed due to postgres.js typing limitation
+    const closed = await tx`
+      update Time_entries
+      set end_time = now(), updated_at = current_timestamp
+      where end_time is null
+      returning *`;
+    if (closed.length === 0)
+      throw new Error('No active session')
+    const opened = await tx`
+      insert into Time_entries (project_id, description, start_time)
+      values (${data.project_id}, ${data.description}, now())
+      returning *`;
+    return { closed: closed[0], opened: opened[0] };
+  });
+
