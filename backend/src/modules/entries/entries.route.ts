@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
 import {
+  clockInSchema,
   entriesInsertSchema,
   entriesUpdateSchema,
   entryLabelParamsSchema,
@@ -9,14 +10,18 @@ import {
 import { paramsSchema } from "../../schemas/project.schema";
 import {
   addLabelToEntry,
+  clockIn,
+  clockOut,
   createEntry,
   deleteEntry,
+  getActiveSession,
   getEntries,
   getEntriesCount,
   getEntryById,
   getEntryLabels,
   modifyEntry,
   removeLabelFromEntry,
+  switchSession,
 } from "./entries.queries";
 
 export const entriesRoutes = new Elysia({ prefix: "/entries" })
@@ -25,6 +30,33 @@ export const entriesRoutes = new Elysia({ prefix: "/entries" })
     if (code === "NOT_FOUND") return status(404, { error: error.message });
     return status(500, { error: "Internal Server Error" });
   })
+
+  .patch(
+    "/clock",
+    async ({ body, status }) => {
+      const [activeSession] = await getActiveSession();
+
+      if (!activeSession) {
+        const result = await clockIn(body);
+        return status(201, result[0]);
+      }
+
+      if (activeSession.project_id === body.project_id) {
+        const result = await clockOut();
+        return result[0];
+      }
+
+      const { opened } = await switchSession(body);
+      return opened;
+    },
+    { body: clockInSchema },
+  )
+  .get("/active", async ({ status }) => {
+    const result = await getActiveSession();
+    if (result.length === 0) return status(404, { error: "No active session" });
+    return result[0];
+  })
+
   .get(
     "",
     async ({ query }) => {

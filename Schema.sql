@@ -23,7 +23,7 @@ create table Time_entries(
     project_id int not null,
     description text not null,
     start_time timestamptz not null,
-    end_time timestamptz not null,
+    end_time timestamptz null,
     created_at timestamptz not null default current_timestamp,
     updated_at timestamptz not null default current_timestamp,
     foreign key (project_id) references Projects(project_id) on delete cascade,
@@ -42,4 +42,9 @@ create table Time_entry_labels(
 
 create index idx_time_entries_project_id on Time_entries(project_id);
 create index idx_time_entry_labels_label_id on Time_entry_labels(label_id);
+
+
+create unique index one_active_entry 
+on Time_entries ((1)) 
+where end_time is null
 
