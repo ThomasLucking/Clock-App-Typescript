@@ -46,7 +46,8 @@ export const entriesRoutes = new Elysia({ prefix: "/entries" })
         return result[0];
       }
 
-      return await switchSession(body);
+      const { opened } = await switchSession(body);
+      return opened;
     },
     { body: clockInSchema },
   )
