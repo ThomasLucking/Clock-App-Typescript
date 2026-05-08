@@ -8,7 +8,7 @@ export const getEntriesCount = () => sql`select count(*) from Time_entries`;
 
 export const createEntry = (data: EntryInsert) =>
   sql`insert into Time_entries (project_id, start_time, end_time, description) 
-      values (${data.project_id}, ${data.start_time}, ${data.description}) 
+      values (${data.project_id}, ${data.start_time}, ${data.end_time} ${data.description}) 
       returning *`;
 
 export const deleteEntry = (id: number) =>
