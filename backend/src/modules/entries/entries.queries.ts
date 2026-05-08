@@ -37,19 +37,6 @@ export const getEntryLabels = (entryId: number) =>
   sql`select l.* from Labels l
       join Time_entry_labels tel on tel.label_id = l.label_id
       where tel.time_entry_id = ${entryId}`;
-
-export const clockIn = (data: ClockIn) =>
-  sql`insert into Time_entries (project_id, description, start_time)
-      values (${data.project_id}, ${data.description}, now())
-      returning *`;
-
-export const clockOut = () =>
-  sql`update Time_entries set end_time = now(), updated_at = current_timestamp
-      where end_time is null returning *`;
-
-export const getActiveSession = () =>
-  sql`select * from Time_entries where end_time is null`;
-
 export const switchSession = (data: ClockIn) =>
   sql.begin(async (txSql) => {
     const tx = txSql as unknown as typeof sql; // cast needed due to postgres.js typing limitation
@@ -66,4 +53,17 @@ export const switchSession = (data: ClockIn) =>
       returning *`;
     return { closed: closed[0], opened: opened[0] };
   });
+export const clockIn = (data: ClockIn) =>
+  sql`insert into Time_entries (project_id, description, start_time)
+      values (${data.project_id}, ${data.description}, now())
+      returning *`;
+
+export const clockOut = () =>
+  sql`update Time_entries set end_time = now(), updated_at = current_timestamp
+      where end_time is null returning *`;
+
+export const getActiveSession = () =>
+  sql`select * from Time_entries where end_time is null`;
+
+
 
