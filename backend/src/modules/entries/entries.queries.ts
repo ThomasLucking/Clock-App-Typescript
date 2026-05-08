@@ -1,5 +1,9 @@
 import sql from "../../db/client";
-import type { ClockIn, EntryInsert, EntryUpdate } from "../../schemas/entries.schema";
+import type {
+  ClockIn,
+  EntryInsert,
+  EntryUpdate,
+} from "../../schemas/entries.schema";
 
 export const getEntries = (limit: number, offset: number) =>
   sql`select * from Time_entries order by created_at desc, time_entry_id desc limit ${limit} offset ${offset}`;
@@ -8,7 +12,7 @@ export const getEntriesCount = () => sql`select count(*) from Time_entries`;
 
 export const createEntry = (data: EntryInsert) =>
   sql`insert into Time_entries (project_id, start_time, end_time, description) 
-      values (${data.project_id}, ${data.start_time}, ${data.end_time} ${data.description}) 
+      values (${data.project_id}, ${data.start_time}, ${data.end_time}, ${data.description}) 
       returning *`;
 
 export const deleteEntry = (id: number) =>
@@ -45,8 +49,7 @@ export const switchSession = (data: ClockIn) =>
       set end_time = now(), updated_at = current_timestamp
       where end_time is null
       returning *`;
-    if (closed.length === 0)
-      throw new Error('No active session')
+    if (closed.length === 0) throw new Error("No active session");
     const opened = await tx`
       insert into Time_entries (project_id, description, start_time)
       values (${data.project_id}, ${data.description}, now())
@@ -64,6 +67,3 @@ export const clockOut = () =>
 
 export const getActiveSession = () =>
   sql`select * from Time_entries where end_time is null`;
-
-
-
