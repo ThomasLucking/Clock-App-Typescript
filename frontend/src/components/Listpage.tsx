@@ -20,6 +20,13 @@ type PaginatedResponse = {
     }
 }
 
+function formatDate(iso: string): string {
+    return new Date(iso).toLocaleString(undefined, {
+        month: 'short', day: 'numeric',
+        hour: 'numeric', minute: '2-digit',
+    })
+}
+
 function formatDuration(start: string, end: string | null): string {
     if (!end) return "Active"
     const ms = new Date(end).getTime() - new Date(start).getTime()
@@ -68,10 +75,8 @@ export default function Listpage() {
                                 <p className="text-xs mt-1 text-gray-500">
                                     Project #{entry.project_id}
                                     {' · '}
-                                    {new Date(entry.start_time).toLocaleString()}
-                                    {entry.end_time
-                                        ? ` → ${new Date(entry.end_time).toLocaleString()}`
-                                        : ' · Active now'}
+                                    {formatDate(entry.start_time)}
+                                    {entry.end_time ? ` → ${formatDate(entry.end_time)}` : ' · Active now'}
                                 </p>
                             </div>
                         </li>

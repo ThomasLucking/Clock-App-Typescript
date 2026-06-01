@@ -1,5 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 import Listpage from '../../components/Listpage'
+import { LoadingState } from '#/components/Loadingstate'
+import { ErrorState } from '#/components/Errorstate'
+
+
 export const Route = createFileRoute('/entries/$page')({
   loader: async ({ params }) => {
     const page = Number(params.page) || 1
@@ -10,6 +14,8 @@ export const Route = createFileRoute('/entries/$page')({
     }
     return response.json()
   },
+  pendingComponent: LoadingState,
+  errorComponent: ErrorState,
   component: Listpage,
 })
 
