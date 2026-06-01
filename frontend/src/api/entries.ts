@@ -1,4 +1,4 @@
-type EntryPayload = {
+export type EntryPayload = {
   project_id: number
   description: string | null
   start_time: string
