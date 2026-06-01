@@ -1,4 +1,4 @@
-import { Link, useNavigate, useLoaderData } from '@tanstack/react-router'
+import { Link, useLoaderData, useNavigate } from '@tanstack/react-router'
 import { updateEntry, type Entry } from '../api/entries'
 
 type EditFormProps = {
@@ -19,9 +19,18 @@ export default function EditForm({ title }: EditFormProps) {
     async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
         e.preventDefault()
         const formData = new FormData(e.currentTarget)
+
+        const startTime = formData.get('start_time') as string
+        const endTime = formData.get('end_time') as string
+
+        if (!startTime || !endTime) {
+            alert('Start time and end time are required')
+            return
+        }
+
         const payload = {
             project_id: Number(formData.get('project_id')),
-            description: formData.get('description'),
+            description: String(formData.get('description')),
             start_time: new Date(formData.get('start_time') as string).toISOString(),
             end_time: new Date(formData.get('end_time') as string).toISOString(),
         }
@@ -52,7 +61,7 @@ export default function EditForm({ title }: EditFormProps) {
                         rows={3}
                         defaultValue={entry.description}
                         placeholder="What did you work on?"
-                        className="rounded-xl border px-3 py-2.5 text-sm text-(--text) `bg-(--bg-base) placeholder:text-(--text-soft) focus:outline-none focus:ring-2 focus:ring-(--accent) resize-none"
+                        className="rounded-xl border px-3 py-2.5 text-sm text-(--text) bg-(--bg-base) placeholder:text-(--text-soft) focus:outline-none focus:ring-2 focus:ring-(--accent) resize-none"
                     />
                 </div>
 

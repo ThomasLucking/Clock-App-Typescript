@@ -3,17 +3,18 @@ import { createEntries } from '../api/entries';
 
 type EntryFormProps = {
     title: string
+    description?: string
 }
 
 export default function EntryForm({ title }: EntryFormProps) {
     const Navigate = useNavigate()
 
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
         e.preventDefault()
         const formData = new FormData(e.currentTarget)
         const payload = {
             project_id: Number(formData.get('project_id')),
-            description: formData.get('description'),
+            description: String(formData.get('description')),
             start_time: new Date(formData.get('start_time') as string).toISOString(),
             end_time: new Date(formData.get('end_time') as string).toISOString(),
         }

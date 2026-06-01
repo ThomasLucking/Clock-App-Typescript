@@ -1,12 +1,12 @@
 type EntryPayload = {
   project_id: number
-  description: FormDataEntryValue | null
+  description: string | null
   start_time: string
   end_time: string
 }
 
 export type Entry = {
-  id: number
+  time_entry_id: number
   project_id: number
   description: string
   start_time: string
