@@ -1,5 +1,5 @@
-import { useLoaderData, useNavigate } from "@tanstack/react-router"
-
+import { useLoaderData } from "@tanstack/react-router"
+import { Link } from "@tanstack/react-router"
 type Entry = {
     time_entry_id: number
     project_id: number
@@ -29,7 +29,7 @@ function formatDate(iso: string): string {
 
 function formatDuration(start: string, end: string | null): string {
     if (!end) return "Active"
-    const ms = new Date(end).getTime() - new Date(start).getTime()
+    const ms = Math.max(0, new Date(end).getTime() - new Date(start).getTime())    
     const h = Math.floor(ms / 3600000)
     const m = Math.floor((ms % 3600000) / 60000)
     const s = Math.floor((ms % 60000) / 1000)
@@ -40,7 +40,6 @@ function formatDuration(start: string, end: string | null): string {
 
 export default function Listpage() {
     const { data, meta } = useLoaderData({ from: '/entries/$page' }) as PaginatedResponse
-    const navigate = useNavigate()
 
     return (
         <div className="max-w-3xl mx-auto px-4 py-12">
@@ -89,20 +88,22 @@ export default function Listpage() {
                     Page {meta.page} of {meta.totalPages}
                 </p>
                 <div className="flex gap-3">
-                    <button
+                    <Link
                         disabled={!meta.hasPrevPage}
-                        onClick={() => navigate({ to: '/entries/$page', params: { page: String(meta.page - 1) } })}
-                        className="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-black disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100"
+                        to="/entries/$page"
+                        params={{ page: String(meta.page - 1) }}
+                        className="rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4 py-2 text-sm font-semibold text-[var(--text)] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[var(--bg-base)]"
                     >
                         ← Previous
-                    </button>
-                    <button
+                    </Link>
+                    <Link
                         disabled={!meta.hasNextPage}
-                        onClick={() => navigate({ to: '/entries/$page', params: { page: String(meta.page + 1) } })}
-                        className="rounded-xl bg-black px-4 py-2 text-sm font-semibold text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-800"
+                        to="/entries/$page"
+                        params={{ page: String(meta.page + 1) }}
+                        className="rounded-xl bg-[var(--text)] px-4 py-2 text-sm font-semibold text-[var(--bg-base)] disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90"
                     >
                         Next →
-                    </button>
+                    </Link>
                 </div>
             </div>
         </div>
