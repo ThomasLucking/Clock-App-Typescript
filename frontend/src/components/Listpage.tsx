@@ -78,6 +78,13 @@ export default function Listpage() {
                                     {entry.end_time ? ` → ${formatDate(entry.end_time)}` : ' · Active now'}
                                 </p>
                             </div>
+                            <Link
+                                to="/entries/$id/edit"
+                                params={{ id: String(entry.time_entry_id) }}
+                                className="shrink-0 rounded-xl border border-gray-300 bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-200"
+                            >
+                                Edit
+                            </Link>
                         </li>
                     ))}
                 </ul>
