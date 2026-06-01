@@ -6,7 +6,7 @@ import { ErrorState } from '#/components/Errorstate'
 
 export const Route = createFileRoute('/entries/$page')({
   loader: async ({ params }) => {
-    const page = Number(params.page) || 1
+    const page =  Math.max(1, Number(params.page) || 1);
     const limit = 10
     const response = await fetch(`/api/entries?page=${page}&limit=${limit}`)
     if (!response.ok) {
