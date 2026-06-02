@@ -10,7 +10,7 @@ export type Entry = {
   project_id: number
   description: string
   start_time: string
-  end_time: string
+  end_time: string | null
 }
 
 export const createEntries = async (payload: EntryPayload) => {

@@ -28,6 +28,7 @@ export const entriesRoutes = new Elysia({ prefix: "/entries" })
   .onError(({ error, code, status }) => {
     if (code === "VALIDATION") return status(422, { error: error.message });
     if (code === "NOT_FOUND") return status(404, { error: error.message });
+    return status(500, { error: "Internal Server Error" });
   })
 
   .patch(

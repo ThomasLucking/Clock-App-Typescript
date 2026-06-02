@@ -1,13 +1,6 @@
 import { Temporal } from "@js-temporal/polyfill";
 import * as v from "valibot";
 
-const datetimeToInstant = v.pipe(
-  v.string(),
-  v.isoDateTimeSecond("Invalid datetime format"),
-  v.transform((s) =>
-    Temporal.PlainDateTime.from(s).toZonedDateTime(USER_TIMEZONE).toInstant(),
-  ),
-);
 
 const isoInstant = v.pipe(
   v.string(),
@@ -15,7 +8,6 @@ const isoInstant = v.pipe(
   v.transform((s) => new Date(s)),
 );
 
-const USER_TIMEZONE = Temporal.Now.timeZoneId();
 export const entriesInsertSchema = v.pipe(
   v.object({
     project_id: v.number(),

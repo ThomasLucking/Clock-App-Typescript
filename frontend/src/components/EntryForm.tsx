@@ -18,14 +18,14 @@ type FormErrors = {
 }
 
 
-const toDatetimeLocal = (iso: string) => {
+const toDatetimeLocal = (iso: string | null | undefined) => {
+  if (!iso) return ''
   const result = Temporal.Instant.from(iso)
     .toZonedDateTimeISO(Temporal.Now.timeZoneId())
     .toPlainDateTime()
     .toString()
     .slice(0, 16)
-    return result
-
+  return result
 }
 
 export default function EntryForm({ title, defaultValues, onSubmit }: EntryFormProps) {
@@ -72,11 +72,7 @@ export default function EntryForm({ title, defaultValues, onSubmit }: EntryFormP
             start_time: Temporal.PlainDateTime.from(startTime).toZonedDateTime(Temporal.Now.timeZoneId()).toInstant().toString(),
             end_time: Temporal.PlainDateTime.from(endTime).toZonedDateTime(Temporal.Now.timeZoneId()).toInstant().toString(),
         }
-        console.log('payload:', payload.start_time, payload.end_time);
-        console.log(Temporal.Now.timeZoneId());
-        console.log(payload);
-
-
+        
         try {
             const response = await onSubmit(payload)
             if (response.ok) {
@@ -120,6 +116,7 @@ export default function EntryForm({ title, defaultValues, onSubmit }: EntryFormP
                         name="project_id"
                         type="number"
                         min={1}
+                        required
                         defaultValue={defaultValues?.project_id}
                         placeholder="Project ID"
                         className="rounded-xl border border-(--line) px-3 py-2.5 text-sm text-(--text) bg-(--bg-base) placeholder:text-(--text-soft) focus:outline-none focus:ring-2 focus:ring-(--accent) [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
