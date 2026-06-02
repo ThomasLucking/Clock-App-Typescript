@@ -17,14 +17,6 @@ create table Labels(
     updated_at timestamptz not null default current_timestamp
 );
 
-create table Projects(
-    project_id int generated always as identity primary key,
-    name varchar(255) not null,
-    description text not null,
-    created_at timestamptz not null default current_timestamp,
-    updated_at timestamptz not null default current_timestamp
-
-);
 
 create table Time_entries(
     time_entry_id int generated always as identity primary key,

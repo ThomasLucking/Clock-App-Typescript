@@ -9,30 +9,23 @@ const datetimeToInstant = v.pipe(
   ),
 );
 
+const isoInstant = v.pipe(
+  v.string(),
+  v.isoTimestamp("Invalid timestamp format"),
+  v.transform((s) => new Date(s)),
+);
+
 const USER_TIMEZONE = Temporal.Now.timeZoneId();
 export const entriesInsertSchema = v.pipe(
   v.object({
     project_id: v.number(),
     description: v.string(),
-
-    start_time: v.pipe(
-      v.string(),
-      v.isoDateTimeSecond("invalid end time format"),
-      v.transform((s) => Temporal.PlainDateTime.from(s)),
-    ),
-
-    end_time: v.nullable(
-      v.pipe(
-        v.string(),
-        v.isoDateTimeSecond("Invalid end time format"),
-        v.transform((s) => Temporal.PlainDateTime.from(s)),
-      ),
-    ),
+    start_time: isoInstant,
+    end_time: v.nullable(isoInstant),
   }),
   v.check((data) => {
     if (!data.end_time) return true;
-
-    return Temporal.PlainDateTime.compare(data.end_time, data.start_time) >= 0;
+    return data.end_time.getTime() >= data.start_time.getTime();
   }, "End time must be after start time"),
 );
 
@@ -51,8 +44,8 @@ export const entriesUpdateSchema = v.pipe(
     v.object({
       project_id: v.number(),
       description: v.string(),
-      start_time: datetimeToInstant,
-      end_time: datetimeToInstant,
+      start_time: isoInstant,
+      end_time: isoInstant,
     }),
   ),
   v.check(
@@ -61,7 +54,7 @@ export const entriesUpdateSchema = v.pipe(
   ),
   v.check((data) => {
     if (!data.start_time || !data.end_time) return true;
-    return Temporal.Instant.compare(data.end_time, data.start_time) >= 0;
+    return data.end_time.getTime() >= data.start_time.getTime();
   }, "End time must be after start time"),
 );
 

@@ -22,10 +22,9 @@ type PaginatedResponse = {
 }
 
 
-
 const formatDate = (iso: string): string => {
   const zdt = Temporal.Instant.from(iso).toZonedDateTimeISO(Temporal.Now.timeZoneId())
-  return zdt.toLocaleString('fr-CH', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
+  return zdt.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
 }
 
 

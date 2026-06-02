@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import { Link, useNavigate } from '@tanstack/react-router'
-import type { Entry, EntryPayload } from '../api/entries'
-import ErrorMessage from './ErrorMessage'
 import { Temporal } from '@js-temporal/polyfill';
+import { Link, useNavigate } from '@tanstack/react-router';
+import { useState } from 'react';
+import type { Entry, EntryPayload } from '../api/entries';
+import ErrorMessage from './ErrorMessage';
 
 
 type EntryFormProps = {
@@ -55,7 +55,7 @@ export default function EntryForm({ title, defaultValues, onSubmit }: EntryFormP
         }
 
         if (!next.start_time && !next.end_time && startTime && endTime &&
-            Temporal.PlainDateTime.compare(endTime, startTime) <= 0) {
+            Temporal.PlainDateTime.compare(endTime, startTime) < 0) {
             next.end_time = 'End time must be after start time'
         }
 
@@ -69,9 +69,8 @@ export default function EntryForm({ title, defaultValues, onSubmit }: EntryFormP
         const payload: EntryPayload = {
             project_id: Number(formData.get('project_id')),
             description: String(formData.get('description')),
-            start_time: Temporal.PlainDateTime.from(startTime).toString(),
-            end_time: Temporal.PlainDateTime.from(endTime).toString(),
-
+            start_time: Temporal.PlainDateTime.from(startTime).toZonedDateTime(Temporal.Now.timeZoneId()).toInstant().toString(),
+            end_time: Temporal.PlainDateTime.from(endTime).toZonedDateTime(Temporal.Now.timeZoneId()).toInstant().toString(),
         }
         console.log('payload:', payload.start_time, payload.end_time);
         console.log(Temporal.Now.timeZoneId());

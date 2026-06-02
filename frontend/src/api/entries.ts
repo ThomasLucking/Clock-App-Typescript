@@ -24,6 +24,9 @@ export const createEntries = async (payload: EntryPayload) => {
 
 export const getEntry = async (id: string): Promise<Entry> => {
   const response = await fetch(`/api/entries/${id}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch entry: ${response.statusText}`);
+  }
   return response.json();
 };
 
