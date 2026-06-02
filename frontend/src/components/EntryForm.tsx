@@ -1,5 +1,9 @@
+import { useState } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import type { Entry, EntryPayload } from '../api/entries'
+import ErrorMessage from './ErrorMessage'
+import { Temporal } from '@js-temporal/polyfill';
+
 
 type EntryFormProps = {
     title: string
@@ -7,10 +11,26 @@ type EntryFormProps = {
     onSubmit: (payload: EntryPayload) => Promise<Response>
 }
 
-const toDatetimeLocal = (iso: string) => iso.slice(0, 16)
+type FormErrors = {
+    start_time?: string
+    end_time?: string
+    form?: string
+}
+
+
+const toDatetimeLocal = (iso: string) => {
+  const result = Temporal.Instant.from(iso)
+    .toZonedDateTimeISO(Temporal.Now.timeZoneId())
+    .toPlainDateTime()
+    .toString()
+    .slice(0, 16)
+    return result
+
+}
 
 export default function EntryForm({ title, defaultValues, onSubmit }: EntryFormProps) {
     const navigate = useNavigate()
+    const [errors, setErrors] = useState<FormErrors>({})
 
     async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
         e.preventDefault()
@@ -18,26 +38,55 @@ export default function EntryForm({ title, defaultValues, onSubmit }: EntryFormP
         const startTime = formData.get('start_time') as string
         const endTime = formData.get('end_time') as string
 
-        if (!startTime || !endTime) {
-            alert('Start time and end time are required')
+        const next: FormErrors = {}
+
+        if (!startTime) {
+            next.start_time = 'Start time is required'
+        } else {
+            try { Temporal.PlainDateTime.from(startTime) }
+            catch { next.start_time = 'Start time is not a valid date' }
+        }
+
+        if (!endTime) {
+            next.end_time = 'End time is required'
+        } else {
+            try { Temporal.PlainDateTime.from(endTime) }
+            catch { next.end_time = 'End time is not a valid date' }
+        }
+
+        if (!next.start_time && !next.end_time && startTime && endTime &&
+            Temporal.PlainDateTime.compare(endTime, startTime) <= 0) {
+            next.end_time = 'End time must be after start time'
+        }
+
+        if (Object.keys(next).length > 0) {
+            setErrors(next)
             return
         }
+
+        setErrors({})
 
         const payload: EntryPayload = {
             project_id: Number(formData.get('project_id')),
             description: String(formData.get('description')),
-            start_time: new Date(startTime).toISOString(),
-            end_time: new Date(endTime).toISOString(),
+            start_time: Temporal.PlainDateTime.from(startTime).toString(),
+            end_time: Temporal.PlainDateTime.from(endTime).toString(),
+
         }
+        console.log('payload:', payload.start_time, payload.end_time);
+        console.log(Temporal.Now.timeZoneId());
+        console.log(payload);
+
+
         try {
             const response = await onSubmit(payload)
             if (response.ok) {
                 navigate({ to: '/entries/$page', params: { page: '1' } })
             } else {
-                alert('Failed to save entry')
+                setErrors({ form: 'Failed to save entry. Please try again.' })
             }
-        } catch (error) {
-            alert('An error occurred while saving the entry')
+        } catch {
+            setErrors({ form: 'An unexpected error occurred. Please try again.' })
         }
     }
 
@@ -89,6 +138,7 @@ export default function EntryForm({ title, defaultValues, onSubmit }: EntryFormP
                         defaultValue={defaultValues ? toDatetimeLocal(defaultValues.start_time) : undefined}
                         className="rounded-xl border border-(--line) px-3 py-2.5 text-sm text-(--text) bg-(--bg-base) focus:outline-none focus:ring-2 focus:ring-(--accent)"
                     />
+                    <ErrorMessage message={errors.start_time} />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
@@ -102,7 +152,10 @@ export default function EntryForm({ title, defaultValues, onSubmit }: EntryFormP
                         defaultValue={defaultValues ? toDatetimeLocal(defaultValues.end_time) : undefined}
                         className="rounded-xl border border-(--line) px-3 py-2.5 text-sm text-(--text) bg-(--bg-base) focus:outline-none focus:ring-2 focus:ring-(--accent)"
                     />
+                    <ErrorMessage message={errors.end_time} />
                 </div>
+
+                <ErrorMessage message={errors.form} />
 
                 <div className="flex items-center justify-end gap-3 pt-4 border-t border-(--line)">
                     <Link
