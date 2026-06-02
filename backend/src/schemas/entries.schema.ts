@@ -1,24 +1,39 @@
+import { Temporal } from "@js-temporal/polyfill";
 import * as v from "valibot";
 
+const datetimeToInstant = v.pipe(
+  v.string(),
+  v.isoDateTimeSecond("Invalid datetime format"),
+  v.transform((s) =>
+    Temporal.PlainDateTime.from(s).toZonedDateTime(USER_TIMEZONE).toInstant(),
+  ),
+);
+
+const USER_TIMEZONE = Temporal.Now.timeZoneId();
 export const entriesInsertSchema = v.pipe(
   v.object({
     project_id: v.number(),
     description: v.string(),
+
     start_time: v.pipe(
       v.string(),
-      v.isoTimestamp(),
-      v.transform((s) => new Date(s)),
+      v.isoDateTimeSecond("invalid end time format"),
+      v.transform((s) => Temporal.PlainDateTime.from(s)),
     ),
-    end_time: v.pipe(
-      v.string(),
-      v.isoTimestamp(),
-      v.transform((s) => new Date(s)),
+
+    end_time: v.nullable(
+      v.pipe(
+        v.string(),
+        v.isoDateTimeSecond("Invalid end time format"),
+        v.transform((s) => Temporal.PlainDateTime.from(s)),
+      ),
     ),
   }),
-  v.check(
-    (data) => data.end_time >= data.start_time,
-    "End time must be after start time",
-  ),
+  v.check((data) => {
+    if (!data.end_time) return true;
+
+    return Temporal.PlainDateTime.compare(data.end_time, data.start_time) >= 0;
+  }, "End time must be after start time"),
 );
 
 export const entriesSchema = v.object({
@@ -36,29 +51,18 @@ export const entriesUpdateSchema = v.pipe(
     v.object({
       project_id: v.number(),
       description: v.string(),
-      start_time: v.pipe(
-        v.string(),
-        v.isoTimestamp(),
-        v.transform((s) => new Date(s)),
-      ),
-      end_time: v.pipe(
-        v.string(),
-        v.isoTimestamp(),
-        v.transform((s) => new Date(s)),
-      ),
+      start_time: datetimeToInstant,
+      end_time: datetimeToInstant,
     }),
   ),
   v.check(
     (data) => Object.values(data).some((v) => v !== undefined),
     "At least one field must be provided",
   ),
-  v.check(
-    (data) =>
-      data.start_time === undefined ||
-      data.end_time === undefined ||
-      data.end_time >= data.start_time,
-    "End time must be after start time",
-  ),
+  v.check((data) => {
+    if (!data.start_time || !data.end_time) return true;
+    return Temporal.Instant.compare(data.end_time, data.start_time) >= 0;
+  }, "End time must be after start time"),
 );
 
 export const clockInSchema = v.object({

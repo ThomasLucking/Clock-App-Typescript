@@ -1,4 +1,5 @@
 import sql from "../../db/client";
+
 import type {
   ClockIn,
   EntryInsert,
@@ -10,10 +11,17 @@ export const getEntries = (limit: number, offset: number) =>
 
 export const getEntriesCount = () => sql`select count(*) from Time_entries`;
 
-export const createEntry = (data: EntryInsert) =>
-  sql`insert into Time_entries (project_id, start_time, end_time, description) 
-      values (${data.project_id}, ${data.start_time}, ${data.end_time}, ${data.description}) 
+export const createEntry = (data: EntryInsert) => {
+  console.log(data.end_time?.toString());
+  return sql`insert into Time_entries (project_id, start_time, end_time, description) 
+      values (
+        ${data.project_id}, 
+        ${data.start_time.toString()}, 
+        ${data.end_time ? data.end_time.toString() : null}, 
+        ${data.description}
+      ) 
       returning *`;
+};
 
 export const deleteEntry = (id: number) =>
   sql`delete from Time_entries where time_entry_id = ${id} returning *`;
@@ -24,9 +32,9 @@ export const getEntryById = (id: number) =>
 export const modifyEntry = (data: EntryUpdate, id: number) =>
   sql`update Time_entries set
       project_id = COALESCE(${data.project_id ?? null}, project_id),
+      start_time = COALESCE(${data.start_time ? new Date(data.start_time.epochMilliseconds) : null}, start_time),
+      end_time = COALESCE(${data.end_time ? new Date(data.end_time.epochMilliseconds) : null}, end_time),
       description = COALESCE(${data.description ?? null}, description),
-      start_time = COALESCE(${data.start_time ?? null}, start_time),
-      end_time = COALESCE(${data.end_time ?? null}, end_time),
       updated_at = current_timestamp
       where time_entry_id = ${id}
       returning *`;
