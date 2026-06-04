@@ -1,5 +1,7 @@
 {
+  "workspaces": ["backend", "frontend"],
   "dependencies": {
+    "@elysiajs/eden": "^1.4.0",
     "@elysiajs/cors": "^1.4.2",
     "@js-temporal/polyfill": "^0.5.1",
     "elysia": "^1.4.28",

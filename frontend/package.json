@@ -12,6 +12,9 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@elysiajs/eden": "^1.4.0",
+    "backend": "workspace:*",
+    "elysia": "^1.4.28",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-devtools": "latest",
     "@tanstack/react-router": "latest",
