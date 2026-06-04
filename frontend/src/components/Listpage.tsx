@@ -1,5 +1,6 @@
-import { useLoaderData } from "@tanstack/react-router"
-import { Link } from "@tanstack/react-router"
+import { Temporal } from "@js-temporal/polyfill"
+import { Link, useLoaderData } from "@tanstack/react-router"
+
 type Entry = {
     time_entry_id: number
     project_id: number
@@ -20,23 +21,26 @@ type PaginatedResponse = {
     }
 }
 
-function formatDate(iso: string): string {
-    return new Date(iso).toLocaleString(undefined, {
-        month: 'short', day: 'numeric',
-        hour: 'numeric', minute: '2-digit',
-    })
+
+const formatDate = (iso: string): string => {
+  const zdt = Temporal.Instant.from(iso).toZonedDateTimeISO(Temporal.Now.timeZoneId())
+  return zdt.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
 }
 
-function formatDuration(start: string, end: string | null): string {
-    if (!end) return "Active"
-    const ms = Math.max(0, new Date(end).getTime() - new Date(start).getTime())    
-    const h = Math.floor(ms / 3600000)
-    const m = Math.floor((ms % 3600000) / 60000)
-    const s = Math.floor((ms % 60000) / 1000)
-    if (h > 0) return `${h}h ${m}m`
-    if (m > 0) return `${m}m ${s}s`
-    return `${s}s`
+
+const formatDuration = (start: string, end: string | null): string => {
+  if (!end) return 'Active'
+
+  const diff = Temporal.Instant.from(start)
+    .until(Temporal.Instant.from(end), { largestUnit: 'hour' })
+
+  const { hours, minutes, seconds } = diff
+
+  if (hours > 0)   return `${hours}h ${minutes}m`
+  if (minutes > 0) return `${minutes}m ${seconds}s`
+  return `${seconds}s`
 }
+
 
 export default function Listpage() {
     const { data, meta } = useLoaderData({ from: '/entries/$page' }) as PaginatedResponse
@@ -78,6 +82,13 @@ export default function Listpage() {
                                     {entry.end_time ? ` → ${formatDate(entry.end_time)}` : ' · Active now'}
                                 </p>
                             </div>
+                            <Link
+                                to="/entries/$id/edit"
+                                params={{ id: String(entry.time_entry_id) }}
+                                className="shrink-0 rounded-xl border border-gray-300 bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-200"
+                            >
+                                Edit
+                            </Link>
                         </li>
                     ))}
                 </ul>

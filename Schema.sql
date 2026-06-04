@@ -1,5 +1,5 @@
 drop table Labels cascade;
-
+ 
 create table Projects(
     project_id int generated always as identity primary key,
     name varchar(255) not null,
@@ -42,6 +42,7 @@ create table Time_entry_labels(
 
 create index idx_time_entries_project_id on Time_entries(project_id);
 create index idx_time_entry_labels_label_id on Time_entry_labels(label_id);
+
 
 
 create unique index one_active_entry 

@@ -1,24 +1,24 @@
+import { Temporal } from "@js-temporal/polyfill";
 import * as v from "valibot";
+
+
+const isoInstant = v.pipe(
+  v.string(),
+  v.isoTimestamp("Invalid timestamp format"),
+  v.transform((s) => new Date(s)),
+);
 
 export const entriesInsertSchema = v.pipe(
   v.object({
     project_id: v.number(),
     description: v.string(),
-    start_time: v.pipe(
-      v.string(),
-      v.isoTimestamp(),
-      v.transform((s) => new Date(s)),
-    ),
-    end_time: v.pipe(
-      v.string(),
-      v.isoTimestamp(),
-      v.transform((s) => new Date(s)),
-    ),
+    start_time: isoInstant,
+    end_time: v.nullable(isoInstant),
   }),
-  v.check(
-    (data) => data.end_time >= data.start_time,
-    "End time must be after start time",
-  ),
+  v.check((data) => {
+    if (!data.end_time) return true;
+    return data.end_time.getTime() >= data.start_time.getTime();
+  }, "End time must be after start time"),
 );
 
 export const entriesSchema = v.object({
@@ -36,29 +36,18 @@ export const entriesUpdateSchema = v.pipe(
     v.object({
       project_id: v.number(),
       description: v.string(),
-      start_time: v.pipe(
-        v.string(),
-        v.isoTimestamp(),
-        v.transform((s) => new Date(s)),
-      ),
-      end_time: v.pipe(
-        v.string(),
-        v.isoTimestamp(),
-        v.transform((s) => new Date(s)),
-      ),
+      start_time: isoInstant,
+      end_time: isoInstant,
     }),
   ),
   v.check(
     (data) => Object.values(data).some((v) => v !== undefined),
     "At least one field must be provided",
   ),
-  v.check(
-    (data) =>
-      data.start_time === undefined ||
-      data.end_time === undefined ||
-      data.end_time >= data.start_time,
-    "End time must be after start time",
-  ),
+  v.check((data) => {
+    if (!data.start_time || !data.end_time) return true;
+    return data.end_time.getTime() >= data.start_time.getTime();
+  }, "End time must be after start time"),
 );
 
 export const clockInSchema = v.object({
